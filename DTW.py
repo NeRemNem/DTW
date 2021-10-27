@@ -92,20 +92,24 @@ def get_traj(name, root_path='Datas/'):
                 _z = round(data['traj'][i]['z'], 4)
                 l.append((_x, _z))
             traj = np.array(l)
-            trajs.append((traj,name))
+            trajs.append((traj, name))
     return trajs
 
 
-def comparison(t1, t2, name):
-    costs =[]
+def comparison(t1, t2, name, save_path=""):
+    costs = []
+    path = save_path+name+r"\\"
+    if path != "":
+        if not os.path.exists(path):
+            os.makedirs(path)
     for x in t1:
         for y in t2:
-            costs.append( cal_dtw(x[0], y[0], x[1], y[1]))
+            costs.append(compute_dtw(x[0], y[0], x[1], y[1], path))
     print(f"{name} mean cost : {np.mean(costs)}")
 
 
-def cal_dtw(x, y, x_name, y_name, has_name=True):
-    x_traj, y_traj = x,y
+def compute_dtw(x, y, x_name, y_name, save_path="",show=False):
+    x_traj, y_traj = x, y
     x_name, y_name = x_name, y_name
     title_name = x_name + ' & ' + y_name
 
@@ -114,17 +118,21 @@ def cal_dtw(x, y, x_name, y_name, has_name=True):
     path, cost = path_cost_p(x_traj, y_traj, accumulated_cost=accumulated_cost, distances=dist)
     path = numpy.array(path)
 
-    plt.figure(figsize=(20, 30))
-
 
     for [x, y] in path:
         plt.plot([x_traj[x, 0], y_traj[y, 0]], [x_traj[x, 1], y_traj[y, 1]], c='C7', markersize=0.1)
     plt.plot(x_traj[:, 0], x_traj[:, 1], 'ro-', label=x_name, markersize=1)
-    plt.plot( y_traj[:, 0], y_traj[:, 1], 'g^-', label=y_name, markersize=1)
+    plt.plot(y_traj[:, 0], y_traj[:, 1], 'g^-', label=y_name, markersize=1)
     print(title_name + ' cost :', cost)
     plt.legend()
     plt.title(title_name)
-    plt.show()
+    plt.figure(figsize=(20, 30))
+
+    if save_path != "":
+        plt.savefig(os.path.join(save_path+ title_name + ".png"))
+    else:
+        if show:
+            plt.show()
     return cost
 
 
@@ -133,35 +141,14 @@ soft_lr = "SoftLR"
 hard_lr = "HardLR"
 soft_break = "SoftBreak"
 hard_break = "HardBreak"
+demo_lr = "LRDemo"
+demo_break = "BreakDemo"
+
+save_path = r"C:\Users\user\Desktop\DTW\Img\\"
 
 if __name__ == "__main__":
-    ppo = get_traj(ppo)
-    soft_lr = get_traj(soft_lr)
-    hard_lr = get_traj(hard_lr)
+    demo_break = get_traj(demo_break)
     soft_break = get_traj(soft_break)
     hard_break = get_traj(hard_break)
-
-    comparison(ppo, hard_break,"ppo, hard")
-    comparison(ppo, soft_break,"ppo, soft")
-
-    #
-    #
-    # LongPPO = (get_traj(LongPPO), LongPPO)
-    # RR01 = (get_traj(RR01), RR01)
-    # RR03 = (get_traj(RR03), RR03)
-    # LongRR01 = (get_traj(LongRR01), LongRR01)
-    # LongRR03 = (get_traj(LongRR03), LongRR03)
-    # LR01 = (get_traj(LR01), LR01)
-    # LR03 = (get_traj(LR03), LR03)
-    # LRDEMO = (get_traj(LRDEMO), LRDEMO)
-    # RRDEMO = (get_traj(RRDEMO), RRDEMO)
-    #
-    # cal_dtw(RRDEMO, LongRR01)
-    # cal_dtw(RRDEMO, LongRR03)
-    # cal_dtw(LongPPO, LongRR01)
-    # cal_dtw(LongPPO, LongRR03)
-    #
-    # cal_dtw(LRDEMO, LR01)
-    # cal_dtw(LRDEMO, LR03)
-    # cal_dtw(PPO, LR01)
-    # cal_dtw(PPO, LR03)
+    comparison(demo_break, soft_break, "BreakDemo, SoftBreak", save_path)
+    comparison(demo_break, hard_break, "BreakDemo, HardBreak", save_path)
