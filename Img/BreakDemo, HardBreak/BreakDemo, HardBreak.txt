@@ -1,0 +1,6 @@
+BreakDemo & HardBreak_0 cost :2137.9353198586637
+BreakDemo & HardBreak_1 cost :2407.943086358432
+BreakDemo & HardBreak_2 cost :2662.8350565388632
+BreakDemo & HardBreak_3 cost :2332.2424266493954
+BreakDemo & HardBreak_4 cost :2159.780632912206
+BreakDemo, HardBreak mean cost : 2340.1473044635122

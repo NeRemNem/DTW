@@ -1,0 +1,6 @@
+BreakDemo & SoftBreak_0 cost :25310.636910591154
+BreakDemo & SoftBreak_1 cost :24381.109512401923
+BreakDemo & SoftBreak_2 cost :25033.33438519185
+BreakDemo & SoftBreak_3 cost :25149.63599954475
+BreakDemo & SoftBreak_4 cost :25408.920673875837
+BreakDemo, SoftBreak mean cost : 25056.727496321102

@@ -98,42 +98,51 @@ def get_traj(name, root_path='Datas/'):
 
 def comparison(t1, t2, name, save_path=""):
     costs = []
-    path = save_path+name+r"\\"
+    str_l = []
+    path = save_path + name + r"\\"
     if path != "":
         if not os.path.exists(path):
             os.makedirs(path)
     for x in t1:
         for y in t2:
-            costs.append(compute_dtw(x[0], y[0], x[1], y[1], path))
+            cost, result = compute_dtw(x[0], y[0], x[1], y[1], path)
+            str_l.append(str(result))
+            print(result)
+            costs.append(cost)
+
+    str_l.append(str(f"{name} mean cost : {np.mean(costs)}"))
     print(f"{name} mean cost : {np.mean(costs)}")
+    with open(path+name+".txt",'a') as f:
+        for i in str_l:
+            f.write(i+'\n')
 
 
-def compute_dtw(x, y, x_name, y_name, save_path="",show=False):
+def compute_dtw(x, y, x_name, y_name, save_path="", show=False):
     x_traj, y_traj = x, y
-    x_name, y_name = x_name, y_name
     title_name = x_name + ' & ' + y_name
 
     dist = generates_distances2D(x_traj, y_traj)
     accumulated_cost = generates_accumulated_cost_p(x_traj, y_traj, dist)
-    path, cost = path_cost_p(x_traj, y_traj, accumulated_cost=accumulated_cost, distances=dist)
-    path = numpy.array(path)
-
-
-    for [x, y] in path:
-        plt.plot([x_traj[x, 0], y_traj[y, 0]], [x_traj[x, 1], y_traj[y, 1]], c='C7', markersize=0.1)
-    plt.plot(x_traj[:, 0], x_traj[:, 1], 'ro-', label=x_name, markersize=1)
-    plt.plot(y_traj[:, 0], y_traj[:, 1], 'g^-', label=y_name, markersize=1)
-    print(title_name + ' cost :', cost)
-    plt.legend()
-    plt.title(title_name)
+    dtw_path, cost = path_cost_p(x_traj, y_traj, accumulated_cost=accumulated_cost, distances=dist)
+    dtw_path = numpy.array(dtw_path)
     plt.figure(figsize=(20, 30))
 
-    if save_path != "":
-        plt.savefig(os.path.join(save_path+ title_name + ".png"))
-    else:
-        if show:
-            plt.show()
-    return cost
+
+    plt.title(title_name)
+
+    for [x, y] in dtw_path:
+        plt.plot([x_traj[x, 0], y_traj[y, 0]], [x_traj[x, 1], y_traj[y, 1]], c='C7', markersize=0.1)
+
+    plt.plot(x_traj[:, 0], x_traj[:, 1], 'ro-', label=x_name[:-2], markersize=1)
+    plt.plot(y_traj[:, 0], y_traj[:, 1], 'g^-', label=y_name[:-2], markersize=1)
+    plt.legend()
+
+    result = title_name + ' cost :'+ str(cost)
+    fig = plt.gcf()
+    fig.savefig(os.path.join(save_path + title_name + ".png"), dpi=300)
+    plt.clf()
+    plt.close()
+    return cost, result
 
 
 ppo = "PPO"
@@ -144,11 +153,27 @@ hard_break = "HardBreak"
 demo_lr = "LRDemo"
 demo_break = "BreakDemo"
 
-save_path = r"C:\Users\user\Desktop\DTW\Img\\"
+save_path = r"R:\DTW\Img\\"
 
 if __name__ == "__main__":
+    ppo = get_traj(ppo)
+
+    soft_lr = get_traj(soft_lr)
+    hard_lr = get_traj(hard_lr)
+
+    demo_lr = get_traj(demo_lr)
     demo_break = get_traj(demo_break)
+
     soft_break = get_traj(soft_break)
     hard_break = get_traj(hard_break)
+    #comparison(ppo, soft_lr, "PPO, SoftLR", save_path)
+    comparison(ppo, hard_lr, "PPO, HardLR", save_path)
+
+    comparison(demo_lr, soft_lr, "LRDemo, SoftLR", save_path)
+    comparison(demo_lr, hard_lr, "LRDemo, HardLR", save_path)
+
+    comparison(ppo, soft_break, "PPO, SoftBreak", save_path)
+    comparison(ppo, hard_break, "PPO, HardBreak", save_path)
+
     comparison(demo_break, soft_break, "BreakDemo, SoftBreak", save_path)
     comparison(demo_break, hard_break, "BreakDemo, HardBreak", save_path)
